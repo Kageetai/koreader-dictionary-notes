@@ -4,17 +4,16 @@ Add a note to a selected word directly from KOReader’s dictionary popup, and k
 
 ```text
 ◀◀        Highlight    Add note    ▶▶
-Wikipedia X-Ray        Search      Close
+Wikipedia             Search      Close
 ```
 
-The X-Ray button appears only when supplied by an installed X-Ray plugin. The patch moves the existing button; it does not install X-Ray or change its action. Customized layouts place Add note immediately after Highlight and X-Ray immediately after Wikipedia.
+Customized layouts place Add note immediately after Highlight. Other plugins keep their own button positions.
 
 ## Features
 
 - Add note highlights the exact selected word and opens KOReader’s normal note editor.
 - No need to tap Highlight first.
 - Keeps Highlight and Add note in the same row, with smaller dictionary navigation buttons.
-- Moves the existing X-Ray button next to Wikipedia.
 - Preserves other plugin buttons and their callbacks.
 
 ## Requirements
@@ -48,7 +47,6 @@ https://github.com/Kageetai/koreader-dictionary-notes
 - The action is offered for selections in the book, not dictionary-only searches or Wikipedia popups.
 - The standard layouts use four buttons per row. Custom layouts with more actions can become crowded.
 - Other patches that replace dictionary layout methods may conflict.
-- X-Ray integration recognizes the current `xray_lookup` button ID and the legacy `X-Ray` label.
 
 ## Development
 

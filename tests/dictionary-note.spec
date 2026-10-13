@@ -45,13 +45,16 @@ local function checkInline(rows, want_rows, want_position)
 end
 checkInline({{{id='prev_dict'}, {id='highlight'}, {id='next_dict'}}, {{id='close'}}, {{id='dictionary_add_note'}}}, 2, 3)
 checkInline({{{id='search'}, {id='highlight'}}, {{id='dictionary_add_note'}, {id='other_plugin'}}}, 2, 3)
--- X-Ray must move even when no Add note action is present.
+-- Other plugins retain their rows, with and without Add note present.
 local xray = {id='xray_lookup', callback=function() return 'original action' end}
 local layout = setmetatable({rows={{{id='wikipedia'}, {id='search'}, {id='close'}}, {xray}}, width=500}, {__index=Lookup}):buildButtonLayout()
-assert(#layout == 1, 'Remove the standalone X-Ray row')
-assert(layout[1][2] == xray and xray.callback() == 'original action', 'Move X-Ray beside Wikipedia preserving its action')
-local mixed = setmetatable({rows={{{id='wikipedia'}, {id='search'}}, {{id='other_plugin'}, {text='X-Ray'}}}, width=500}, {__index=Lookup}):buildButtonLayout()
-assert(#mixed == 2 and mixed[1][2].text == 'X-Ray' and mixed[2][1].id == 'other_plugin', 'Preserve other plugin buttons and support legacy labels')
+assert(#layout == 2 and layout[2][1] == xray, 'Keep the standalone X-Ray row')
+assert(xray.callback() == 'original action', 'Preserve the X-Ray action')
+local legacy = {text='X-Ray'}
+local other = {id='other_plugin'}
+local mixed = setmetatable({rows={{{id='highlight'}}, {{id='wikipedia'}, {id='search'}}, {other, legacy}, {{id='dictionary_add_note'}}}, width=500}, {__index=Lookup}):buildButtonLayout()
+assert(#mixed == 3 and mixed[1][2].id == 'dictionary_add_note', 'Keep Add note inline')
+assert(mixed[3][1] == other and mixed[3][2] == legacy and #mixed[2] == 2, 'Preserve other plugin positions')
 action.callback(popup)
 assert(popup.closed and saves == 1, 'Create exactly one highlight')
 assert(#notes == 1 and notes[1][1] == 7 and notes[1][2] == true, 'Edit new highlight note')
@@ -60,4 +63,4 @@ assert(not action.show_func({isDocless = function() return true end}))
 assert(not action.show_func({isDocless = function() return false end}))
 action.callback({isDocless = function() return true end})
 assert(saves == 1, 'Invalid lookups must not create highlights')
-print('PASS: inline layouts, X-Ray action, exact selection, single save, note editor, invalid lookups')
+print('PASS: inline Add note, unchanged plugin rows, exact selection, single save, note editor, invalid lookups')

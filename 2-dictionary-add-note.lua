@@ -15,18 +15,21 @@ local function hasSelection(popup)
     return selected ~= nil and selected.pos0 ~= nil and selected.pos1 ~= nil
 end
 
-local function moveBeside(rows, anchor_id, matches)
+-- Keep Add note beside Highlight without rearranging other plugins.
+local original_build = DictQuickLookup.buildButtonLayout
+function DictQuickLookup:buildButtonLayout(...)
+    local rows = original_build(self, ...)
     local anchor_row, anchor_column, action_row, action_column
     for r, row in ipairs(rows) do
         for c, button in ipairs(row) do
-            if button.id == anchor_id then
+            if button.id == "highlight" then
                 anchor_row, anchor_column = r, c
-            elseif matches(button) then
+            elseif button.id == "dictionary_add_note" then
                 action_row, action_column = r, c
             end
         end
     end
-    if not anchor_row or not action_row then return end
+    if not anchor_row or not action_row then return rows end
     local target = rows[anchor_row]
     local source = rows[action_row]
     local action = table.remove(source, action_column)
@@ -35,20 +38,6 @@ local function moveBeside(rows, anchor_id, matches)
     end
     table.insert(target, anchor_column + 1, action)
     if source ~= target and #source == 0 then table.remove(rows, action_row) end
-    return target
-end
-
--- Arrange the existing actions after configured and plugin buttons have
--- been assembled, preserving their callbacks and unrelated rows.
-local original_build = DictQuickLookup.buildButtonLayout
-function DictQuickLookup:buildButtonLayout(...)
-    local rows = original_build(self, ...)
-    local target = moveBeside(rows, "highlight", function(button)
-        return button.id == "dictionary_add_note"
-    end)
-    moveBeside(rows, "wikipedia", function(button)
-        return button.id == "xray_lookup" or button.text == "X-Ray"
-    end)
     -- Leave most of a standard four-button row to the two text actions.
     if target and #target == 4 then
         local prev, next_button
