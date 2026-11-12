@@ -15,7 +15,7 @@ local function hasSelection(popup)
     return selected ~= nil and selected.pos0 ~= nil and selected.pos1 ~= nil
 end
 
--- Keep Add note beside Highlight without rearranging other plugins.
+-- Keep Note beside Highlight without rearranging other plugins.
 local original_build = DictQuickLookup.buildButtonLayout
 function DictQuickLookup:buildButtonLayout(...)
     local rows = original_build(self, ...)
@@ -59,7 +59,7 @@ function ReaderDictionary:init(...)
     original_init(self, ...)
     self:addToDictButtons({
         id = "dictionary_add_note",
-        text = _("Add note"),
+        text = _("Note"),
         -- A contextual row also appears with existing customized layouts.
         conditional = true,
         show_func = hasSelection,
