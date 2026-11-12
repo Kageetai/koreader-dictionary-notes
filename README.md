@@ -7,13 +7,14 @@ Add a note to a selected word directly from KOReader’s dictionary popup, and k
 Wikipedia             Search      Close
 ```
 
-Customized layouts place Note immediately after Highlight. Other plugins keep their own button positions.
+The default layout places Note immediately after Highlight. Customized layouts use your chosen button order and visibility. Other plugins keep their own button positions.
 
 ## Features
 
 - Note highlights the exact selected word and opens KOReader’s normal note editor.
 - No need to tap Highlight first.
-- Keeps Highlight and Note in the same row, with smaller dictionary navigation buttons.
+- Keeps Highlight and Note in the same default row, with smaller dictionary navigation buttons.
+- Adds Note to KOReader’s **Sort and toggle buttons** settings.
 - Preserves other plugin buttons and their callbacks.
 
 ## Requirements
@@ -32,6 +33,8 @@ Check **Help → Report a bug → Build flavor** in KOReader to identify the And
 4. Long-press a word to open the dictionary, then tap **Note**.
 
 To update, replace the existing file with the same filename and restart KOReader. To uninstall, delete the file and restart.
+
+If you already customized dictionary buttons, enable **Note** under **Dictionary settings → Customize buttons → Sort and toggle buttons**. You can reorder it there and adjust **Max buttons in row** to put it in your preferred row.
 
 ## Storefront and App Store
 

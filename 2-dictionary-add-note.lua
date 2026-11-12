@@ -15,10 +15,11 @@ local function hasSelection(popup)
     return selected ~= nil and selected.pos0 ~= nil and selected.pos1 ~= nil
 end
 
--- Keep Note beside Highlight without rearranging other plugins.
+-- Keep Note beside Highlight only in the default layout.
 local original_build = DictQuickLookup.buildButtonLayout
 function DictQuickLookup:buildButtonLayout(...)
     local rows = original_build(self, ...)
+    if G_reader_settings:readSetting("dict_button_config") then return rows end
     local anchor_row, anchor_column, action_row, action_column
     for r, row in ipairs(rows) do
         for c, button in ipairs(row) do
@@ -59,9 +60,8 @@ function ReaderDictionary:init(...)
     original_init(self, ...)
     self:addToDictButtons({
         id = "dictionary_add_note",
+        menu_text = _("Note"),
         text = _("Note"),
-        -- A contextual row also appears with existing customized layouts.
-        conditional = true,
         show_func = hasSelection,
         callback = function(popup)
             if not hasSelection(popup) then return end

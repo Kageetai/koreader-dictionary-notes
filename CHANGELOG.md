@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add Note to dictionary button sorting and toggling.
+- Honor saved button positions and visibility; keep Note beside Highlight in the default layout.
+
 ## 1.0.1 — 2026-10-13
 
 - Stop moving the X-Ray button; other plugins keep their own layout.

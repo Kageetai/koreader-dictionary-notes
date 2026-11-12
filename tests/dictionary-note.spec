@@ -6,6 +6,12 @@ function Dictionary:addToDictButtons(spec) self._dict_buttons[spec.id] = spec en
 package.loaded['apps/reader/modules/readerdictionary'] = Dictionary
 package.loaded.gettext = function(s) return s end
 package.loaded['ui/size'] = {border = {window = 1}, padding = {default = 2}}
+local button_config
+G_reader_settings = {}
+function G_reader_settings:readSetting(key)
+    assert(key == 'dict_button_config')
+    return button_config
+end
 local Lookup = {}
 function Lookup:buildButtonLayout() return self.rows end
 package.loaded['ui/widget/dictquicklookup'] = Lookup
@@ -15,7 +21,8 @@ local dict = setmetatable({}, { __index = Dictionary })
 dict:init()
 local action = dict._dict_buttons.dictionary_add_note
 assert(action, 'Add note action must be registered')
-assert(action.conditional, 'Action must appear even with a saved custom layout')
+assert(not action.conditional and action.menu_text == 'Note',
+    'Note must be registered for KOReader sorting and toggling')
 local selection = { text = 'word', pos0 = 'start', pos1 = 'end' }
 local notes, saves = {}, 0
 local highlight = { selected_text = selection }
@@ -55,6 +62,18 @@ local other = {id='other_plugin'}
 local mixed = setmetatable({rows={{{id='highlight'}}, {{id='wikipedia'}, {id='search'}}, {other, legacy}, {{id='dictionary_add_note'}}}, width=500}, {__index=Lookup}):buildButtonLayout()
 assert(#mixed == 3 and mixed[1][2].id == 'dictionary_add_note', 'Keep Add note inline')
 assert(mixed[3][1] == other and mixed[3][2] == legacy and #mixed[2] == 2, 'Preserve other plugin positions')
+button_config = {layout = {{'dictionary_add_note', 'highlight', 'next_dict', 'prev_dict'}}}
+local custom_rows = {{{id='dictionary_add_note'}, {id='highlight'}, {id='next_dict'}, {id='prev_dict'}}}
+local custom = setmetatable({rows=custom_rows, width=500}, {__index=Lookup}):buildButtonLayout()
+assert(#custom == 1 and #custom[1] == 4 and custom[1][1].id == 'dictionary_add_note'
+    and custom[1][2].id == 'highlight', 'Honor the saved Note position')
+assert(custom[1][3].width == nil and custom[1][4].width == nil,
+    'Leave custom layout widths to KOReader')
+local disabled_rows = {{{id='highlight'}, xray}}
+local disabled = setmetatable({rows=disabled_rows, width=500}, {__index=Lookup}):buildButtonLayout()
+assert(#disabled == 1 and #disabled[1] == 2 and disabled[1][2] == xray,
+    'Do not reinsert a disabled Note button')
+button_config = nil
 action.callback(popup)
 assert(popup.closed and saves == 1, 'Create exactly one highlight')
 assert(#notes == 1 and notes[1][1] == 7 and notes[1][2] == true, 'Edit new highlight note')
@@ -63,4 +82,4 @@ assert(not action.show_func({isDocless = function() return true end}))
 assert(not action.show_func({isDocless = function() return false end}))
 action.callback({isDocless = function() return true end})
 assert(saves == 1, 'Invalid lookups must not create highlights')
-print('PASS: inline Add note, unchanged plugin rows, exact selection, single save, note editor, invalid lookups')
+print('PASS: sortable Note registration, default placement, custom placement, disabled Note, unchanged plugin rows, exact selection, single save, note editor, invalid lookups')
